@@ -29,7 +29,7 @@ class BitReader():
         low_bits = 2**(self.available_bits-n) - 1
         high_bits = ones_mask - low_bits
         nbits = self.current_num & high_bits
-        self.current_num -= high_bits
+        self.current_num -= nbits
         nbits = nbits >> (self.available_bits - n)
         self.available_bits -= n
         return nbits
