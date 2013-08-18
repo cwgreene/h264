@@ -21,16 +21,19 @@ def extract_frame_flv(flvtag, flvfile):
     timestamp = flvfile.read(3)
     timestampext = flvfile.read(1)
     streamid = flvfile.read(3)
-    data = flvfile.read(datasize) # h264 goodness! mmHHMM!
+    # AVC Packet metadata, we should already be a NALU
+    bytes_to_num(flvfile.read(1))
+    assert(bytes_to_num(flvfile.read(1)) == 1)
+    assert(bytes_to_num(flvfile.read(3)) == 0)
+
+    # This is one more piece of AVC metadata, unfortunately, I can't find the
+    # standard document to figure out how to parse it. At the moment
+    # ignoring the next 4 bytes seems to work. I think it's length
+    # info.
+    bytes_to_num(flvfile.read(4)) 
+    data = flvfile.read(datasize) # h264 goodness! mmHHMM!  
     flvfile.seek(pos) # return to original position
     return data
-
-def h264_nalu_old(data):
-    datasize = len(data)
-    zero_bit = bytes_to_num(data[0]) & 128
-    nal_ref_idc = (bytes_to_num(data[0]) & (127 & ~31)) >> 5
-    nal_unit_type = bytes_to_num(data[0]) & 31
-    return zero_bit, nal_ref_idc, nal_unit_type, datasize
 
 def h264_nalu(data):
     datasize = len(data)
@@ -43,12 +46,12 @@ def h264_nalu(data):
 def h264_read(flv, f):
     stats = defaultdict(int)
     for i, tag in enumerate(flv.iter_tags(), 1):
-        if isinstance(tag, tags.VideoTag):
+        if isinstance(tag, tags.VideoTag) and tag.h264_packet_type==1:
+            print tag
             zero_bit, nal_ref_idc, nal_unit_type, datasize = h264_nalu(extract_frame_flv(tag, f))
             result = zero_bit, nal_ref_idc, nal_unit_type
-            print datasize
             stats[result] += 1
-            print "Tag #%d" % i, result
+            print "Tag #%d" % i, result, datasize
     print stats
 
 def main(args):
