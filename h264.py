@@ -1,6 +1,9 @@
 from flvlib import tags
 from collections import defaultdict
 import sys
+from StringIO import StringIO
+
+import bitreader
    
 def bytes_to_num(bytes):
     l = len(bytes)
@@ -22,11 +25,19 @@ def extract_frame_flv(flvtag, flvfile):
     flvfile.seek(pos) # return to original position
     return data
 
-def h264_nalu(data):
+def h264_nalu_old(data):
     datasize = len(data)
     zero_bit = bytes_to_num(data[0]) & 128
     nal_ref_idc = (bytes_to_num(data[0]) & (127 & ~31)) >> 5
     nal_unit_type = bytes_to_num(data[0]) & 31
+    return zero_bit, nal_ref_idc, nal_unit_type, datasize
+
+def h264_nalu(data):
+    datasize = len(data)
+    bitdata = bitreader.BitReader(StringIO(data))
+    zero_bit = bitdata.read_bits(1)
+    nal_ref_idc = bitdata.read_bits(2)
+    nal_unit_type = bitdata.read_bits(5)
     return zero_bit, nal_ref_idc, nal_unit_type, datasize
 
 def h264_read(flv, f):
