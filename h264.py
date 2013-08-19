@@ -138,21 +138,7 @@ def h264_nalu(data):
     zero_bit = bitdata.read_bits(1)
     nal_ref_idc = bitdata.read_bits(2)
     nal_unit_type = bitdata.read_bits(5)
-    rbsp_bytes = []
-    i = 1
-    while i < datasize:
-        if i + 2 < datasize:
-            rbsp_bytes.append(bitdata.read_bits(8))
-            rbsp_bytes.append(bitdata.read_bits(8))
-            third_byte = bitdata.read_bits(8)
-            i += 2
-            if rbsp_bytes[-1] == 0 and rbsp_bytes[-2] == 0 and third_byte == 3:
-                i+=1
-                continue
-            rbsp_bytes.append(third_byte)
-        else:
-            rbsp_bytes.append(bitdata.read_bits(8))
-        i += 1
+    rbsp_bytes = data[1:].replace("\x00\x00\x03","\x00\x00")
     return zero_bit, nal_ref_idc, nal_unit_type, rbsp_bytes
 
 def readAVCDecoderConfigurationRecord(data):
