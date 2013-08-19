@@ -1,4 +1,6 @@
-=== h264 parser ===
+h264 parser
+==========
+
 This project is attempting to write an h264 parse in python. It is currently
 in a state of flux. Eventually, as it stabilizes, individual commits to master
 will have the guarantee of working. At the moment, no such guarantees are present.
