@@ -34,6 +34,25 @@ class BitReader():
         self.available_bits -= n
         return nbits
 
+    def read_ugolomb(self):
+        def consume_zeros():
+            """ Will read up to, and including the next 1 """
+            bit = self.read_bits(1)
+            count = 0
+            while bit == 0:
+                count += 1
+                bit = self.read_bits(1)
+            return count
+        try
+            zeros = consume_zeros()
+        except:
+            raise Exception("Invalid Golomb Code: No 1's found")
+        try:
+            num = 2**(zeros) + self.read_bits(zeros) - 1
+        except Exception as e:
+            raise Exception("Invalid Golomb code: Insufficient bits after leading zeros")
+        return num
+
 def testReadPastByte(byte):
     bitReader = testReadByte(byte, [2,2,4])
     bitReader = testReadByte(byte, [2,2,2,2])
@@ -64,11 +83,19 @@ def testReadBytes(bytes, groups):
             % (bits_read, 8*len(bytes)))
     print "Read byte!"
 
+def testuGolomb(byte):
+    print bin(ord(byte))
+    bitreader = BitReader(StringIO.StringIO(byte))  
+    print "Golomb: %s => %d" % (bin(ord(byte)), bitreader.read_ugolomb())
+
 def test():
     testReadPastByte("\xff")
+    testReadBytes(chr(1), [8])
     testReadBytes("\xff\xff", [2,8,6])
     testReadBytes("\x0f\x0f", [2,8,6])
     testReadBytes("\x00\x00", [2,8,6])
+    testuGolomb(chr(int('10000000',2)))
+    testuGolomb(chr(int('00111000',2)))
     
 def main():
     test()
