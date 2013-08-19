@@ -138,19 +138,21 @@ def h264_nalu(data):
     zero_bit = bitdata.read_bits(1)
     nal_ref_idc = bitdata.read_bits(2)
     nal_unit_type = bitdata.read_bits(5)
-    bytes_read = 1
     rbsp_bytes = []
-    for i in range(1, datasize):
+    i = 1
+    while i < datasize:
         if i + 2 < datasize:
-            rbsp_bytes.append(bitreader.read(8))       
-            rbsp_bytes.append(bitreader.read(8))
-            third_byte = bitreader.read(8)
+            rbsp_bytes.append(bitdata.read_bits(8))
+            rbsp_bytes.append(bitdata.read_bits(8))
+            third_byte = bitdata.read_bits(8)
             i += 2
             if rbsp_bytes[-1] == 0 and rbsp_bytes[-2] == 0 and third_byte == 3:
+                i+=1
                 continue
             rbsp_bytes.append(third_byte)
-        elif:
-            rbsp_bytes.append(bitreader.read(8))
+        else:
+            rbsp_bytes.append(bitdata.read_bits(8))
+        i += 1
     return zero_bit, nal_ref_idc, nal_unit_type, rbsp_bytes
 
 def readAVCDecoderConfigurationRecord(data):
@@ -179,7 +181,7 @@ def readAVCDecoderConfigurationRecord(data):
     print "numOfPictureParameterSets", numOfPictureParameterSets
     for i in range(numOfPictureParameterSets):
         length = bitdata.read_bits(16)
-        pps.append(flvfile.read((length)))
+        pps.append(flvfile.read(length))
     return lengthSizeMinusOne, sps, pps
 
 def h264_read(flv, f):
@@ -193,7 +195,7 @@ def h264_read(flv, f):
             zero_bit, nal_ref_idc, nal_unit_type, datasize = h264_nalu(extract_frame_flv(tag, f))
             result = zero_bit, nal_ref_idc, nal_unit_type
             stats[result] += 1
-            print "Tag #%d" % i, result, datasize
+            #print "Tag #%d" % i, result[:-1], datasize
     print stats
 
 def main(args):

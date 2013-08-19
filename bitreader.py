@@ -52,6 +52,11 @@ class BitReader():
         except Exception as e:
             raise Exception("Invalid Golomb code: Insufficient bits after leading zeros")
         return num
+    def read_sgolomb(self):
+        golomb = self.read_ugolomb()
+        if golomb % 2 == 0:
+            return (golomb / 2) * -1
+        return (golomb+1) / 2
 def main():
     import tests.bitreader_tests
     tests.bitreader_tests.test()
