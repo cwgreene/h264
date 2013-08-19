@@ -38,43 +38,43 @@ def read_sequence_paramter_set(data):
         offset_for_top_to_bottom_filed = bitdata.read_sgolomb()
         num_ref_frames_in_pic_order_cnt_cycle = bitdata.read_ugolomb()
         for i in range(num_ref_frames_in_pic_order_cnt_cycle):
-            offset_for_ref_frame.append(bit_data.read_sgolomb)
-    num_ref_frames = bit_data.read_ugolomb()
-    gaps_in_frame_num_value_allowed_flag = bit_data.read_bits(1)
-    pic_width_in_mbs_minus1 = bit_data.read_ugolomb()
-    pic_height_in_map_units_minus1 = bit_data.read_ugolomb()
-    frame_mbs_only_flag = bit_data.read_bits(1)
+            offset_for_ref_frame.append(bitdata.read_sgolomb)
+    num_ref_frames = bitdata.read_ugolomb()
+    gaps_in_frame_num_value_allowed_flag = bitdata.read_bits(1)
+    pic_width_in_mbs_minus1 = bitdata.read_ugolomb()
+    pic_height_in_map_units_minus1 = bitdata.read_ugolomb()
+    frame_mbs_only_flag = bitdata.read_bits(1)
     if not frame_mbs_only_flag:
-        mb_adapative_frame_field_flag = bit_data.read_bits(1)
-    direct_8x8_inference_flag = bit_data.read_bits(1)
-    frame_cropping_flag = bit_data.read_bits(1)
+        mb_adapative_frame_field_flag = bitdata.read_bits(1)
+    direct_8x8_inference_flag = bitdata.read_bits(1)
+    frame_cropping_flag = bitdata.read_bits(1)
     if frame_cropping_flag:
-        frame_crop_left_offst = bit_data.read_ugolomb()
-        frame_crop_right_offset = bit_data.read_ugolomb()
-        frame_crop_top_offset = bit_data.read_ugolomb()
-        frame_crop_bottom_offset = bit_data.read_ugolomb()
-    vui_paramaters_present_flag = bit_data.read_bits(1)
+        frame_crop_left_offst = bitdata.read_ugolomb()
+        frame_crop_right_offset = bitdata.read_ugolomb()
+        frame_crop_top_offset = bitdata.read_ugolomb()
+        frame_crop_bottom_offset = bitdata.read_ugolomb()
+    vui_paramaters_present_flag = bitdata.read_bits(1)
     if vui_paramaters_present_flag:
         vui_paramaters()
 
 def read_picture_paramter_set(data):
     bitdata = bitreader.BitReader(data)
-    pic_parameter_set_id = bit_data.read_ugolomb()
-    seq_parameter_set_id = bit_data.read_ugolomb()
-    entropy_coding_mode_flag = bit_data.read_bits(1)
-    num_slice_groups_minus1 = bit_data.read_ugolomb()
+    pic_parameter_set_id = bitdata.read_ugolomb()
+    seq_parameter_set_id = bitdata.read_ugolomb()
+    entropy_coding_mode_flag = bitdata.read_bits(1)
+    num_slice_groups_minus1 = bitdata.read_ugolomb()
     if num_slice_groups_minus1 > 0:
-        slice_group_map_type = bit_data.read_ugolomb()
+        slice_group_map_type = bitdata.read_ugolomb()
         if slice_group_map_type == 0:
             run_length_minus1 = []
             for iGroup in range(num_slice_groups_minus1 + 1):
-                run_length_minus1.append(bit_data.read_ugolomb())
+                run_length_minus1.append(bitdata.read_ugolomb())
         elif slice_group_map_type == 2:
             top_left = []
             bottom_right = []
             for iGroup in range(num_slice_groups_minus1 + 1):
-                top_left.append(bit_data.read_ugolomb())
-                bottom_right.append(bit_data.read_ugolomb())
+                top_left.append(bitdata.read_ugolomb())
+                bottom_right.append(bitdata.read_ugolomb())
         elif slice_group_map_type in [3,4,5]:
             slice_group_change_direction_flag = bitdata.read_bits(1)
             slice_gropu_change_rate_minus1 = bitdata.read_ugolomb()
